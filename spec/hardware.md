@@ -41,6 +41,8 @@ Recorded: 2026-09-10. Machine: pcM (Cardinal workstation, Mac).
 |---|---|
 | `conda run -n moose cardinal-opt --version` | ~2.4 s |
 | `conda run -n openmc python -c "import openmc"` | ~2.3 s |
+| T1 `mesh.i --mesh-only` (lwr_solid, `~/cardinal_tutorials/`) | ~2.4 s |
+| T1 standalone OpenMC eigenvalue (lwr_solid `openmc.i`, 500 particles, 50 inactive / 100 batches, VIII.0 CE) | ~11 s wall; k-eff (combined) = 1.15162 ± 0.00623; Solve Converged |
 
-Tutorial runs 1–5 (instructions STEP 3) are PENDING; timings will be
+Tutorials 2–5 (instructions STEP 3) are PENDING; timings will be
 appended here as they complete.
