@@ -25,11 +25,22 @@
 
 ## Group structure (project-wide, fixed 2026-09-10)
 
-- **2 groups** (fast + thermal). Thermal cutoff to be fixed in Step 5
-  (proposal: 0.625 eV) and recorded here before any coupled run.
-- Per region / per group in `nuclearData`: sigmaTot, sigmaA,
-  nuSigmaF, chi, scattering matrix (or D); plus beta_i / lambda_i
-  for transients.
+- **2 groups**, fast + thermal, thermal cutoff **0.625 eV**
+  (OpenMC groups [0, 0.625 eV] thermal, [0.625 eV, 20 MeV] fast).
+- Pin-cell k-inf (ENDF/B-VIII.0, 70 batches / 20 inactive / 8000
+  particles): **1.38810 +/- 0.00123**, leakage 0. Sanity: supercritical
+  infinite lattice as expected for 20 %-enriched ZrH (finite core goes
+  critical via leakage + rods + reflector); cf. storage studies where
+  infinite TRIGA arrays stay supercritical below ~6.5 cm pitch.
+- Homogenized constants (`genfoam/constant/neutroRegion/nuclearData`,
+  SI units), zone0:
+  removal (4.77341, 8.4919) 1/m; nuSigmaF (0.379899, 12.5219) 1/m;
+  scatter ((39.7524, 4.22693), (0.023426, 201.932)) 1/m;
+  D (0.00749023, 0.00158363) m; chi (1, 0); IV (6.63e-06, 3.32e-04) s/m.
+- Kinetics: U-235 Keepin 6-group lambdas/betas (TRIGA is U-235 driven;
+  NOT the Pu-like tutorial values). discFactor = 1, chiDelayed = (1 0).
+- Smoke test: constants run in GeN-Foam diffusion (2D channel case),
+  neutronics converges, k = 1.331 (consistent with k-inf minus leakage).
 
 ## TRIGA fuel (to be detailed in Step 5)
 

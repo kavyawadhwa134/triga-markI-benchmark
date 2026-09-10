@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<tallies>
+  <filter id="1" type="universe">
+    <bins>3</bins>
+  </filter>
+  <filter id="2" type="energy">
+    <bins>0.0 0.625 20000000.0</bins>
+  </filter>
+  <filter id="13" type="energyout">
+    <bins>0.0 0.625 20000000.0</bins>
+  </filter>
+  <filter id="14" type="legendre">
+    <order>1</order>
+  </filter>
+  <filter id="17" type="energy">
+    <bins>0.0 20000000.0</bins>
+  </filter>
+  <tally id="33">
+    <filters>1 2</filters>
+    <nuclides>total</nuclides>
+    <scores>flux total absorption fission nu-fission kappa-fission inverse-velocity</scores>
+    <estimator>tracklength</estimator>
+  </tally>
+  <tally id="34">
+    <filters>1 2</filters>
+    <nuclides>total</nuclides>
+    <scores>flux</scores>
+    <estimator>analog</estimator>
+  </tally>
+  <tally id="21">
+    <filters>1 2 13 14</filters>
+    <nuclides>total</nuclides>
+    <scores>scatter</scores>
+    <estimator>analog</estimator>
+  </tally>
+  <tally id="22">
+    <filters>1 17</filters>
+    <nuclides>total</nuclides>
+    <scores>nu-fission</scores>
+    <estimator>analog</estimator>
+  </tally>
+  <tally id="23">
+    <filters>1 13</filters>
+    <nuclides>total</nuclides>
+    <scores>nu-fission</scores>
+    <estimator>analog</estimator>
+  </tally>
+  <tally id="31">
+    <filters>1 13 14</filters>
+    <nuclides>total</nuclides>
+    <scores>scatter</scores>
+    <estimator>analog</estimator>
+  </tally>
+</tallies>
