@@ -1,0 +1,24 @@
+# ---> OpenFOAM
+# ---> foamForNuclear build artefacts
+processor*/
+[0-9]*/
+[0-9]*.[0-9]*/
+log.GeN-Foam
+log.simulation
+*.OpenFOAM
+VTK/
+*.vtk
+*.vtu
+*.vtm
+*.foam
+# ---> OpenMC artefacts
+*.h5
+statepoint.*.h5
+summary.h5
+tallies.out
+*.tar.xz
+# ---> ParaView state (keep exported PNGs/CSVs, not state files)
+*.pvsm
+# ---> Python
+__pycache__/
+*.pyc
