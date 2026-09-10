@@ -16,8 +16,15 @@
 > - Nuclear-data library release, file sizes, md5sum
 > - Multigroup structure (shared with pcL, if generated via Cardinal)
 >
-> Local note (pcM, recorded 2026-09-10, NOT yet approved as the shared
-> library): `~/moose/cross_sections/endfb-vii.1-hdf5/` exists locally
-> (ENDF/B-VII.1 HDF5, 5.8 GB; `cross_sections.xml` 63 KB,
-> md5 `7b757a25054bdc75ad6bb921017b9c66`). Supervisor to confirm whether
-> the shared library is this release or ENDF/B-VIII.0.
+> Agreed shared library (supervisor, 2026-09-10): **ENDF/B-VIII.0 HDF5,
+> same release both sides (pcM + pcL).**
+>
+> pcM copy: `/Users/kavyawadhwa/Documents/Digital Twin/nuclear_data/endfb-viii.0-hdf5/`
+> (13 GB; `cross_sections.xml` 46 KB,
+> md5 `7d5aafd5badbc1882d01c7ec5e33beb6`).
+> `OPENMC_CROSS_SECTIONS` points at this `cross_sections.xml`.
+> pcL to confirm identical md5 on its side.
+>
+> NOT the shared library: `~/moose/cross_sections/endfb-vii.1-hdf5/`
+> (ENDF/B-VII.1 HDF5, 5.8 GB) also exists on pcM but must NOT be used
+> for benchmark runs.
