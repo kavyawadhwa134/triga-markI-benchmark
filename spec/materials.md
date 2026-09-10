@@ -14,7 +14,11 @@
 > - Material compositions and densities (fuel, clad, coolant, reflector)
 > - Temperature references for cross-section evaluation
 > - Nuclear-data library release, file sizes, md5sum
-> - Multigroup structure (shared with pcL, if generated via Cardinal)
+> - Multigroup structure: **2 groups agreed (supervisor, 2026-09-10).**
+>   Cardinal name `CASMO_2`, boundaries 0 / 0.625 eV / 20 MeV (thermal
+>   cutoff 0.625 eV) per `EnergyGroupStructures.h` in the pcM Cardinal
+>   build. Tutorial 2 (`lwr_mgxs`, `group_structure = CASMO_2`) generates
+>   these constants for pcL to consume; share the generated MGXS via git.
 >
 > Agreed shared library (supervisor, 2026-09-10): **ENDF/B-VIII.0 HDF5,
 > same release both sides (pcM + pcL).**
