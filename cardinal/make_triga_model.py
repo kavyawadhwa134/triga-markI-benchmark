@@ -12,7 +12,10 @@ R_FUEL = 1.815
 R_CLAD = 1.866
 
 
-def build_model(particles=500, batches=10, inactive=3):
+def build_model(particles=None, batches=None, inactive=None):
+    particles = int(os.environ.get("TRIGA_PARTICLES", particles or 500))
+    batches = int(os.environ.get("TRIGA_BATCHES", batches or 10))
+    inactive = int(os.environ.get("TRIGA_INACTIVE", inactive or 3))
     fuel = openmc.Material(name="uzrh_fuel", material_id=1)
     fuel.set_density("g/cc", 6.0)
     fuel.add_nuclide("U235", 1.7, "wo")
@@ -65,6 +68,11 @@ def build_model(particles=500, batches=10, inactive=3):
         space=openmc.stats.Box(
             [-PITCH / 2, -PITCH / 2, -1.0],
             [PITCH / 2, PITCH / 2, 1.0]))
+    settings.temperature = {
+        "method": "nearest",
+        "range": (250.0, 2500.0),
+        "default": 293.0,
+    }
 
     materials = openmc.Materials([fuel, clad, water])
     return openmc.Model(geometry, materials, settings)
