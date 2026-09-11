@@ -1,5 +1,16 @@
 #include "udf.hpp"
 
+// v26 requires an embedded OKL section even when no custom device kernel is
+// needed by the surrogate. This no-op kernel satisfies that requirement.
+#ifdef __okl__
+@kernel void trigaNoop(const dlong N)
+{
+  for (dlong n = 0; n < N; ++n; @tile(p_blockSize, @outer, @inner))
+  {
+  }
+}
+#endif
+
 // Minimal v26-compatible UDF. Optional velRecycling/tavg plugins are omitted
 // so the reduced TRIGA channel uses only the installed Cardinal/NekRS APIs.
 void UDF_Setup(nrs_t *nrs)
