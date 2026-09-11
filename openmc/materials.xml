@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='utf-8'?>
+<materials>
+  <material id="1" name="uzrh_fuel" depletable="true">
+    <density value="6.0" units="g/cc"/>
+    <nuclide name="U235" wo="1.7"/>
+    <nuclide name="U238" wo="6.8"/>
+    <nuclide name="Zr90" wo="45.5655313161471"/>
+    <nuclide name="Zr91" wo="10.047369083105426"/>
+    <nuclide name="Zr92" wo="15.526447537245536"/>
+    <nuclide name="Zr94" wo="16.077304184116638"/>
+    <nuclide name="Zr96" wo="2.645347879385302"/>
+    <nuclide name="H1" wo="1.638"/>
+    <sab name="c_H_in_ZrH"/>
+    <sab name="c_Zr_in_ZrH"/>
+  </material>
+  <material id="2" name="ss304">
+    <density value="7.9" units="g/cc"/>
+    <nuclide name="Fe54" wo="3.9801185470083333"/>
+    <nuclide name="Fe56" wo="64.79057778959154"/>
+    <nuclide name="Fe57" wo="1.5230598726406188"/>
+    <nuclide name="Fe58" wo="0.20624379075952148"/>
+    <nuclide name="Cr50" wo="0.7930004583164795"/>
+    <nuclide name="Cr52" wo="15.902878846755721"/>
+    <nuclide name="Cr53" wo="1.837981495548285"/>
+    <nuclide name="Cr54" wo="0.4661391993795167"/>
+    <nuclide name="Ni58" wo="6.047793476693091"/>
+    <nuclide name="Ni60" wo="2.4098366609306603"/>
+    <nuclide name="Ni61" wo="0.10650231767670391"/>
+    <nuclide name="Ni62" wo="0.34513400731384525"/>
+    <nuclide name="Ni64" wo="0.09073353738570028"/>
+    <nuclide name="Mn55" wo="1.0"/>
+    <nuclide name="Si28" wo="0.4593675864141838"/>
+    <nuclide name="Si29" wo="0.02415875146393198"/>
+    <nuclide name="Si30" wo="0.01647366212188421"/>
+  </material>
+  <material id="3" name="water">
+    <density value="1.0" units="g/cc"/>
+    <nuclide name="H1" ao="2.0"/>
+    <nuclide name="O16" ao="1.0"/>
+    <sab name="c_H_in_H2O"/>
+  </material>
+</materials>

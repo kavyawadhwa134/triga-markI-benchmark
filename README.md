@@ -1,25 +1,19 @@
-# TRIGA Mark I Benchmark — shared project repository
+# TRIGA Mark I benchmark — shared spec (pcL + pcM)
 
-Single shared source of truth for the TRIGA Mark I multiphysics
-benchmark (pcM: Cardinal/OpenMC+NekRS+MOOSE reference; pcL: OpenMC
-lattice; GeN-Foam diffusion/transients).
+Target: TRIGA Mark I multiphysics (neutronics + thermal-hydraulics).
+This repo is cloned on pcL (GeN-Foam/foamForNuclear side) and pcM
+(OpenMC + Cardinal side). See `pcL.md` / pcM instructions for roles.
 
-## Layout
+Layout:
 
-- `spec/` — shared specifications. `geometry.md`, `materials.md`,
-  `operating.md` are PENDING supervisor approval. `hardware.md` records
-  the pcM workstation.
-- `cardinal/` — pcM working area (OpenMC `.py` inputs, NekRS `.re2`/`.par`,
-  MOOSE master `.i`).
-- `openmc/` — pcL-side OpenMC inputs reference.
-- `genfoam/` — GeN-Foam-side case reference.
-- `tools/` — comparison tooling (e.g. `compare.py`: ExodusII/VTK →
-  common probe CSVs).
-- `results/` — committed probe/CSV outputs for Tier 0 / Tier 2 comparison.
+- `spec/` — geometry, materials, operating, hardware (this folder)
+- `openmc/` — lattice model + group-constant generation scripts
+- `genfoam/` — GeN-Foam case for the TRIGA core
+- `cardinal/` — populated on pcM
+- `tools/` — converters (`openmc2genfoam.py`) + comparison scripts
+- `results/` — committed reference CSVs from BOTH machines
 
-## Scientific rule
-
-Do NOT create an independent TRIGA model or assume final geometry.
-pcL and pcM require consistent geometry, operating conditions,
-materials, nuclear-data library, and group structure. No production
-models until the shared specification is approved.
+Commit rule: small CSV/probe outputs and all inputs are committed.
+Never commit big VTK/Exodus meshes or time directories.
+Remote: pcM owns the canonical remote; pcL adds it as `origin`
+once the link is provided.
