@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<geometry>
+  <cell id="1" name="fuel" material="1" region="-1" universe="1"/>
+  <cell id="2" name="clad" material="2" region="1 -2" universe="1"/>
+  <cell id="3" name="water" material="3" region="2" universe="1"/>
+  <cell id="4" name="root" fill="2" region="3 -4 5 -6" universe="3"/>
+  <lattice id="2" name="core_lat">
+    <pitch>4.235 4.235</pitch>
+    <dimension>1 1</dimension>
+    <lower_left>-2.1175 -2.1175</lower_left>
+    <universes>
+1 </universes>
+  </lattice>
+  <surface id="1" type="z-cylinder" coeffs="0.0 0.0 1.815"/>
+  <surface id="2" type="z-cylinder" coeffs="0.0 0.0 1.866"/>
+  <surface id="3" type="x-plane" boundary="reflective" coeffs="-2.1175"/>
+  <surface id="4" type="x-plane" boundary="reflective" coeffs="2.1175"/>
+  <surface id="5" type="y-plane" boundary="reflective" coeffs="-2.1175"/>
+  <surface id="6" type="y-plane" boundary="reflective" coeffs="2.1175"/>
+</geometry>
