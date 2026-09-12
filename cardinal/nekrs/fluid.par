@@ -1,0 +1,66 @@
+# pcM NekRS: TRIGA coolant subchannel, non-dimensional form.
+#
+# Reference scales (spec/operating.md + spec/thermal.md):
+#   L = D_h = 0.023869 m      U = 0.2 m/s      T_ref = 293 K      dT = 3.567 K
+#   Re = 4755    Pr = 7.01    Pe = 33318
+#
+# Re = 4755 is transitional/turbulent, so this is run as an implicit LES with
+# HPFRT filtering, following Cardinal's tutorials/turbulence/les case which
+# targets Re = 5000. A laminar solve would be physically wrong at this Re.
+# CPU-only NekRS on 8 cores (spec/hardware.md) sets the resolution ceiling.
+#
+# Sideset map: 1 = clad surface, 2 = inlet, 3 = outlet, 4-7 = lateral faces.
+
+[OCCA]
+  backend = CPU
+
+[GENERAL]
+  # Order 7 is the starting resolution. Mesh/order refinement and flow
+  # statistics must establish adequacy for this particular subchannel.
+  #
+  # Nek5000 allocates statically: ~854 arrays of (lx1^3 * lelt) doubles, where
+  # lx1 = polynomialOrder + 1 and lelt = elements per rank. At 2880 elements
+  # the TOTAL across ranks is set by polynomialOrder alone:
+  #     order 5 (lx1=6) ->  4.25 GB     order 7 (lx1=8) -> 10.07 GB
+  #     order 8 (lx1=9) -> 14.34 GB     order 9 (lx1=10) -> 19.68 GB
+  # Adding ranks lowers per-rank memory but NOT the total. Drop to 5 on a
+  # machine with less than ~16 GiB. See docs/RUNBOOK.md Part 6, Trap 1.
+  polynomialOrder = 7
+  stopAt = numSteps
+  numSteps = 2000
+  dt = targetCFL=0.5 + initial=1e-3
+  timeStepper = tombo2
+  checkpointControl = steps
+  checkpointInterval = 500
+
+  # NekRS 26 requires each transported scalar to be named explicitly.
+  scalars = temperature
+
+  # Implicit LES: high-pass filter relaxation term. This is the NekRS 26
+  # spelling of the former filtering/filterWeight/filterModes triplet.
+  regularization = hpfrt + nModes=2 + scalingCoeff=5.0
+
+[FLUID PRESSURE]
+  residualTol = 1.0e-06
+
+[FLUID VELOCITY]
+  rho = 1.0
+  # The legacy negative-Re shorthand is written explicitly in NekRS 26.
+  viscosity = 1/4755
+  # The committed re2 mesh reports non-axis-aligned normals on IDs 4-7.
+  # 'sym' imposes zero normal velocity and homogeneous tangential Neumann
+  # conditions using the actual face normals. All four must use this form:
+  # NekRS 6621767f disallows mixing aligned and unaligned symmetry types.
+  # Verify lateral boundary placement before interpreting production results.
+  boundaryTypeMap = zeroDirichlet, udfDirichlet, zeroNeumann, sym, sym, sym, sym
+  residualTol = 1.0e-07
+
+[SCALAR TEMPERATURE]
+  # Stronger scalar-only filtering reduces the heated-wall temperature
+  # undershoot without materially changing bulk outlet temperature or flow.
+  regularization = hpfrt + nModes=3 + scalingCoeff=10
+  transportCoeff = 1.0
+  # The legacy negative-Pe shorthand is written explicitly in NekRS 26.
+  diffusionCoeff = 1/33318
+  boundaryTypeMap = udfNeumann, udfDirichlet, zeroNeumann, zeroNeumann, zeroNeumann, zeroNeumann, zeroNeumann
+  residualTol = 1.0e-07

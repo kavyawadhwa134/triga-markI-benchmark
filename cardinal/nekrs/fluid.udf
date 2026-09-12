@@ -1,0 +1,125 @@
+#include "udf.hpp"
+
+namespace
+{
+deviceMemory<int> o_wallID;
+deviceMemory<int> o_inletID;
+deviceMemory<int> o_outletID;
+deviceMemory<dfloat> o_temperatureVelocity;
+dfloat wallArea = 0.0;
+
+constexpr dfloat wallHeatFlux = 0.009946;
+// pi * D_clad * H / D_h^2 for the non-dimensionalized 0.60 m channel.
+// This catches lost or multiply-labelled wall faces before an expensive run.
+constexpr dfloat expectedWallArea = 123.470803507277;
+constexpr dfloat wallAreaTolerance = 0.01;
+constexpr int diagnosticInterval = 100;
+}
+
+void UDF_Setup()
+{
+  auto mesh = nrs->meshV;
+
+  const std::vector<int> wallID{1};
+  const std::vector<int> inletID{2};
+  const std::vector<int> outletID{3};
+
+  o_wallID.resize(wallID.size());
+  o_inletID.resize(inletID.size());
+  o_outletID.resize(outletID.size());
+  o_wallID.copyFrom(wallID);
+  o_inletID.copyFrom(inletID);
+  o_outletID.copyFrom(outletID);
+
+  deviceMemory<dfloat> o_one(mesh->Nlocal);
+  platform->linAlg->fill(o_one.size(), 1.0, o_one);
+  wallArea = mesh->surfaceAreaMultiplyIntegrate(o_wallID, o_one);
+
+  const dfloat wallAreaRelativeError =
+      fabs(wallArea - expectedWallArea) / expectedWallArea;
+  nekrsCheck(wallAreaRelativeError > wallAreaTolerance,
+             platform->comm.mpiComm(),
+             EXIT_FAILURE,
+             "PCM wall area mismatch: measured %.12e expected %.12e "
+             "(relative error %.6e). Regenerate fluid.re2 and verify sidesets.\n",
+             wallArea,
+             expectedWallArea,
+             wallAreaRelativeError);
+
+  o_temperatureVelocity.resize(mesh->dim * nrs->fluid->fieldOffset);
+
+  if (platform->comm.mpiRank() == 0)
+    printf("PCM_DIAG_SETUP wallArea=%.12e expectedWallArea=%.12e "
+           "wallAreaRelativeError=%.12e wallHeatInput=%.12e\n",
+           wallArea,
+           expectedWallArea,
+           wallAreaRelativeError,
+           wallHeatFlux * wallArea);
+}
+
+void UDF_ExecuteStep(double time, int tstep)
+{
+  if ((tstep % diagnosticInterval) != 0 && !nrs->checkpointStep)
+    return;
+
+  auto mesh = nrs->meshV;
+  // The solver buffer can also contain time-history storage. The surface
+  // integral requires exactly dim * fieldOffset entries from the current state.
+  auto o_velocity = nrs->fluid->o_solution().slice(
+      0, mesh->dim * nrs->fluid->fieldOffset);
+  auto o_temperature = nrs->scalar->o_solution("temperature");
+
+  const dfloat inletFlow = mesh->surfaceAreaNormalMultiplyVectorIntegrate(
+      nrs->fluid->fieldOffset, o_inletID, o_velocity);
+  const dfloat outletFlow = mesh->surfaceAreaNormalMultiplyVectorIntegrate(
+      nrs->fluid->fieldOffset, o_outletID, o_velocity);
+  const dfloat flowScale =
+      fabs(inletFlow) > fabs(outletFlow) ? fabs(inletFlow) : fabs(outletFlow);
+  const dfloat relativeMassImbalance =
+      flowScale > 0.0 ? fabs(inletFlow + outletFlow) / flowScale : 0.0;
+
+  // Form T*u on the device, then integrate (T*u).n over each open boundary.
+  platform->linAlg->axpbyMany(mesh->Nlocal,
+                              mesh->dim,
+                              nrs->fluid->fieldOffset,
+                              1.0,
+                              o_velocity,
+                              0.0,
+                              o_temperatureVelocity);
+  platform->linAlg->axmyMany(mesh->Nlocal,
+                             mesh->dim,
+                             nrs->fluid->fieldOffset,
+                             0,
+                             1.0,
+                             o_temperature,
+                             o_temperatureVelocity);
+
+  const dfloat inletTemperatureFlow =
+      mesh->surfaceAreaNormalMultiplyVectorIntegrate(
+          nrs->fluid->fieldOffset, o_inletID, o_temperatureVelocity);
+  const dfloat outletTemperatureFlow =
+      mesh->surfaceAreaNormalMultiplyVectorIntegrate(
+          nrs->fluid->fieldOffset, o_outletID, o_temperatureVelocity);
+  const dfloat outletBulkTemperature =
+      fabs(outletFlow) > 0.0 ? outletTemperatureFlow / outletFlow : 0.0;
+  const dfloat temperatureMin = platform->linAlg->min(
+      mesh->Nlocal, o_temperature, platform->comm.mpiComm());
+  const dfloat temperatureMax = platform->linAlg->max(
+      mesh->Nlocal, o_temperature, platform->comm.mpiComm());
+
+  if (platform->comm.mpiRank() == 0)
+    printf("PCM_DIAG step=%d time=%.12e inletFlow=%.12e outletFlow=%.12e "
+           "relativeMassImbalance=%.12e outletBulkTstar=%.12e "
+           "TstarMin=%.12e TstarMax=%.12e advectiveHeatOut=%.12e "
+           "wallHeatInput=%.12e\n",
+           tstep,
+           time,
+           inletFlow,
+           outletFlow,
+           relativeMassImbalance,
+           outletBulkTemperature,
+           temperatureMin,
+           temperatureMax,
+           inletTemperatureFlow + outletTemperatureFlow,
+           wallHeatFlux * wallArea);
+}
