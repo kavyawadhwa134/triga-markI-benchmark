@@ -51,3 +51,9 @@ __pycache__/
 
 # NOTE: small CSV / probe / reference outputs (*.csv) are INTENTIONALLY
 # tracked — they are the Tier 0 / Tier 2 comparison artefacts.
+
+# Local assistant configuration (not part of the project)
+CLAUDE.md
+AGENTS.md
+.claude/
+docs/CODEX_HANDOFF.md

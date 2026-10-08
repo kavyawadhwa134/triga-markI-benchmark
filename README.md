@@ -23,3 +23,9 @@ Do NOT create an independent TRIGA model or assume final geometry.
 pcL and pcM require consistent geometry, operating conditions,
 materials, nuclear-data library, and group structure. No production
 models until the shared specification is approved.
+
+## Development notes
+
+AI coding assistants were used for some code scaffolding, debugging and
+documentation drafting. The physics modelling, simulation setup, validation
+and interpretation of results are the author's own.
